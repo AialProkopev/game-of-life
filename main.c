@@ -1,14 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-//#include <math.h>
 
 #define HEIGHT 25
 #define WIDTH 80
 #define DEAD ' '
 #define ALIVE '*'
 #define BORDER '#'
-#define TIMER 50 // ms
+#define TIMER 50  // ms
 
 void clear_screen();
 char **init_screen();
@@ -34,7 +33,8 @@ int main() {
 
 void clear_screen() { system("clear"); }
 char **create_matrix() {
-    char **matrix = (char **)malloc(HEIGHT * sizeof(char *) + HEIGHT * WIDTH * sizeof(char));
+    char **matrix = (char **)malloc(HEIGHT * sizeof(char *) +
+                                    HEIGHT * WIDTH * sizeof(char));
     char *p = (char *)(matrix + HEIGHT);
     for (int i = 0; i < HEIGHT; i++) {
         matrix[i] = p + WIDTH * i;
@@ -48,10 +48,8 @@ char **init_screen() {
         for (int j = 0; j < WIDTH; j++) {
             if ((i == 0) || (i == HEIGHT - 1) || (j == 0) || (j == WIDTH - 1)) {
                 screen[i][j] = BORDER;
-            }
-            else if (((j == 31) && (i == 8)) || 
-                ((j == 32) && (i == 9)) ||
-                (j >= 30) && (j <= 32) && (i == 10)) {
+            } else if (((j == 31) && (i == 8)) || ((j == 32) && (i == 9)) ||
+                       (j >= 30) && (j <= 32) && (i == 10)) {
                 screen[i][j] = ALIVE;
             } else {
                 screen[i][j] = DEAD;
@@ -71,45 +69,37 @@ void render(char **screen) {
     printf("\n");
 }
 void cycle(char **screen) {
-  char **copy = create_matrix();
-  for (int i = 0; i < HEIGHT; i++) {
-    for (int j = 0; j < WIDTH; j++) {
-      copy[i][j] = screen[i][j];
+    char **copy = create_matrix();
+    for (int i = 0; i < HEIGHT; i++) {
+        for (int j = 0; j < WIDTH; j++) {
+            copy[i][j] = screen[i][j];
+        }
     }
-  }
-  for (int i = 0; i < HEIGHT; i++) {
-    for (int j = 0; j < WIDTH; j++) {
-            //Life
+    for (int i = 0; i < HEIGHT; i++) {
+        for (int j = 0; j < WIDTH; j++) {
+            // Life
             if ((copy[i][j] == DEAD) && (calc_nbr(copy, i, j) == 3)) {
                 screen[i][j] = ALIVE;
             }
-            //Death
-            if ((copy[i][j] == ALIVE) && ((calc_nbr(copy, i, j) < 2) ||
-                        (calc_nbr(copy, i, j) > 3))) {
+            // Death
+            if ((copy[i][j] == ALIVE) &&
+                ((calc_nbr(copy, i, j) < 2) || (calc_nbr(copy, i, j) > 3))) {
                 screen[i][j] = DEAD;
             }
+        }
     }
-  }
-  free(copy);
+    free(copy);
 }
 int calc_nbr(char **screen, int i, int j) {
     int count = 0;
-    if (screen[convert_h(i - 1)][convert_w(j - 1)] == ALIVE)
-        count++;
-    if (screen[convert_h(i - 1)][j] == ALIVE)
-        count++;
-    if (screen[convert_h(i - 1)][convert_w(j + 1)] == ALIVE)
-        count++;
-    if (screen[i][convert_w(j + 1)] == ALIVE)
-        count++;
-    if (screen[convert_h(i + 1)][convert_w(j + 1)] == ALIVE)
-        count++;
-    if (screen[convert_h(i + 1)][j] == ALIVE)
-        count++;
-    if (screen[convert_h(i + 1)][convert_w(j - 1)] == ALIVE)
-        count++;
-    if (screen[i][convert_w(j - 1)] == ALIVE)
-        count++;
+    if (screen[convert_h(i - 1)][convert_w(j - 1)] == ALIVE) count++;
+    if (screen[convert_h(i - 1)][j] == ALIVE) count++;
+    if (screen[convert_h(i - 1)][convert_w(j + 1)] == ALIVE) count++;
+    if (screen[i][convert_w(j + 1)] == ALIVE) count++;
+    if (screen[convert_h(i + 1)][convert_w(j + 1)] == ALIVE) count++;
+    if (screen[convert_h(i + 1)][j] == ALIVE) count++;
+    if (screen[convert_h(i + 1)][convert_w(j - 1)] == ALIVE) count++;
+    if (screen[i][convert_w(j - 1)] == ALIVE) count++;
     return count;
 }
 int convert_h(int num) {
@@ -130,4 +120,3 @@ int convert_w(int num) {
     }
     return res;
 }
-
