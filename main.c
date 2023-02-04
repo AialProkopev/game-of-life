@@ -1,3 +1,4 @@
+#include <ncurses.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -7,7 +8,6 @@
 #define DEAD ' '
 #define ALIVE '*'
 #define BORDER '#'
-#define TIMER 50  // ms
 
 void clear_screen();
 char **init_screen();
@@ -21,12 +21,39 @@ int convert_w(int num);
 int main() {
     char **screen = init_screen();
     int status = 1;
+    int speed = 50000;
+    char key;
+    initscr();
+    noecho();
+    curs_set(0);
+    timeout(0);
     do {
         render(screen);
         cycle(screen);
-        usleep(TIMER * 1000);
+        key = getch();
+        switch (key) {
+            case 27:
+                status = 0;
+                break;
+            case '1':
+                speed = 500000;
+                break;
+            case '2':
+                speed = 100000;
+                break;
+            case '3':
+                speed = 50000;
+                break;
+            case '4':
+                speed = 20000;
+                break;
+            case '5':
+                speed = 10000;
+                break;
+        }
+        usleep(speed);
     } while (status);
-
+    endwin();
     free(screen);
     return 0;
 }
@@ -49,7 +76,7 @@ char **init_screen() {
             if ((i == 0) || (i == HEIGHT - 1) || (j == 0) || (j == WIDTH - 1)) {
                 screen[i][j] = BORDER;
             } else if (((j == 31) && (i == 8)) || ((j == 32) && (i == 9)) ||
-                       (j >= 30) && (j <= 32) && (i == 10)) {
+                       ((j >= 30) && (j <= 32) && (i == 10))) {
                 screen[i][j] = ALIVE;
             } else {
                 screen[i][j] = DEAD;
@@ -59,14 +86,14 @@ char **init_screen() {
     return screen;
 }
 void render(char **screen) {
-    clear_screen();
+    clear();
     for (int i = 0; i < HEIGHT; i++) {
-        if (i != 0) printf("\n");
+        if (i != 0) printw("\n");
         for (int j = 0; j < WIDTH; j++) {
-            printf("%c", screen[i][j]);
+            printw("%c", screen[i][j]);
         }
     }
-    printf("\n");
+    printw("\n");
 }
 void cycle(char **screen) {
     char **copy = create_matrix();
